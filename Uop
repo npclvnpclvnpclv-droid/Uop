@@ -1,0 +1,99 @@
+
+-- Admin Item Spawner UI
+-- ใช้ใน Roblox Studio ของตัวเอง
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local gui = script.Parent
+gui.ResetOnSpawn = false
+
+local old = gui:FindFirstChild("MainPanel")
+if old then old:Destroy() end
+
+local toggle = Instance.new("TextButton")
+toggle.Name = "ToggleButton"
+toggle.Size = UDim2.fromOffset(120, 44)
+toggle.Position = UDim2.new(0, 16, 0.35, 0)
+toggle.Text = "ADMIN ☰"
+toggle.TextScaled = true
+toggle.Parent = gui
+
+local panel = Instance.new("Frame")
+panel.Name = "MainPanel"
+panel.Size = UDim2.new(0.82, 0, 0.65, 0)
+panel.Position = UDim2.new(0.09, 0, 0.17, 0)
+panel.BackgroundColor3 = Color3.fromRGB(28, 30, 40)
+panel.Visible = false
+panel.Parent = gui
+
+local limit = Instance.new("UISizeConstraint")
+limit.MinSize = Vector2.new(270, 280)
+limit.MaxSize = Vector2.new(480, 460)
+limit.Parent = panel
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = panel
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -55, 0, 48)
+title.BackgroundTransparency = 1
+title.Text = "ADMIN ITEM SPAWNER"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
+title.Parent = panel
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.fromOffset(42, 38)
+close.Position = UDim2.new(1, -46, 0, 5)
+close.Text = "✕"
+close.TextScaled = true
+close.Parent = panel
+
+toggle.Activated:Connect(function()
+    panel.Visible = not panel.Visible
+end)
+
+close.Activated:Connect(function()
+    panel.Visible = false
+end)
+
+local items = {
+    "Sword",
+    "Gun",
+    "Fruit",
+    "Pet",
+    "Diamond",
+    "Money"
+}
+
+local y = 58
+
+for _, itemName in ipairs(items) do
+    local button = Instance.new("TextButton")
+    button.Name = itemName .. "Button"
+    button.Size = UDim2.new(1, -24, 0, 42)
+    button.Position = UDim2.new(0, 12, 0, y)
+    button.Text = "เสก " .. itemName
+    button.TextScaled = true
+    button.Parent = panel
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    button.Activated:Connect(function()
+        local event = ReplicatedStorage:FindFirstChild("AdminSpawnEvent")
+        if event and event:IsA("RemoteEvent") then
+            event:FireServer(itemName)
+        else
+            warn("ยังไม่ได้สร้าง AdminSpawnEvent")
+        end
+    end)
+
+    y += 48
+end
